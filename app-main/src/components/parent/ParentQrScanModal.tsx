@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, QrCode, CheckCircle2, AlertTriangle, Video, VideoOff, RefreshCw, Sparkles } from 'lucide-react';
+import { X, QrCode, CheckCircle2, AlertTriangle, Video, VideoOff, RefreshCw, Sparkles, Camera } from 'lucide-react';
 import { NurseryStorageService } from '../../services/storage';
 import { Child, AttendanceRecord } from '../../types/nursery';
 import confetti from 'canvas-confetti';
