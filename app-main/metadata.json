@@ -1,0 +1,10 @@
+{
+  "name": "Modern British Kids Nursery Management",
+  "description": "تطبيق إدارة حضانة Modern British Kids المتكامل للموبايل والتابلت: إدارة الأطفال، الحضور الذكي بـ QR، المصروفات والإيصالات، الرواتب، الحسابات والتقارير، والمتابعة اليومية بتصميم عربي RTL متطور.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
