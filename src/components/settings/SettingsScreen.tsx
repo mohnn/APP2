@@ -1,3 +1,4 @@
+import { compressImageFile } from '../../utils/imageCompress';
 import React, { useState, useRef } from 'react';
 import { ArrowRight, Save, Settings, ShieldCheck, History, RotateCcw, Upload, Image as ImageIcon, Trash2, CheckCircle2 } from 'lucide-react';
 import { NurseryStorageService } from '../../services/storage';
@@ -49,15 +50,12 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
+      compressImageFile(file, 512, 0.85).then(dataUrl => {
         setLogoUrl(dataUrl);
         storage.updateLogo(dataUrl);
         setToastMessage('تم رفع وتعيين شعار الحضانة الجديد بنجاح! 🎓');
         setTimeout(() => setToastMessage(null), 4000);
-      };
-      reader.readAsDataURL(file);
+      }).catch(() => setToastMessage('تعذر قراءة الصورة. جرّب صورة أخرى.'));
     }
   };
 
@@ -72,15 +70,12 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
   const handleBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string;
+      compressImageFile(file, 1280, 0.7).then(dataUrl => {
         setBgUrl(dataUrl);
         storage.updateLoginBackground(dataUrl);
         setToastMessage('تم رفع وتطبيق صورة الخلفية بالكامل لتغطي الشاشة بنجاح! 🎨');
         setTimeout(() => setToastMessage(null), 4000);
-      };
-      reader.readAsDataURL(file);
+      }).catch(() => setToastMessage('تعذر قراءة الصورة. جرّب صورة أخرى.'));
     }
   };
 

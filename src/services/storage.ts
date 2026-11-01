@@ -1,5 +1,6 @@
 import type { GalleryPhoto, Teacher } from '../types/nursery';
 import { deleteVideosForChild, listVideos, deleteVideo } from './videoStore';
+import { queuePush, seedCloudIfNeeded, SYNC_COLLECTIONS, SYNC_DOCS, LocalBridge } from './cloudSync';
 import { NOTIFICATIONS_ENABLED } from '../config/features';
 import { pushNotification, recipientParent, recipientTeacher, RECIPIENT_ADMIN, NotifType } from './notifications';
 import {
@@ -528,6 +529,50 @@ export class NurseryStorageService {
 
   private save<T>(key: string, value: T): void {
     saveToStorage(key, value);
+    queuePush(key, value);
+  }
+
+  // ---------------- المزامنة السحابية ----------------
+  private changeListeners = new Set<() => void>();
+  private changeTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** الاشتراك في تغييرات البيانات القادمة من الأجهزة الأخرى (لإعادة رسم الشاشة) */
+  public subscribe(cb: () => void): () => void {
+    this.changeListeners.add(cb);
+    return () => { this.changeListeners.delete(cb); };
+  }
+
+  private emitChange(): void {
+    if (this.changeTimer) return;
+    this.changeTimer = setTimeout(() => {
+      this.changeTimer = null;
+      this.changeListeners.forEach(cb => { try { cb(); } catch { /* ignore */ } });
+    }, 300);
+  }
+
+  /** تطبيق بيانات وصلت من السحابة (دون إعادة رفعها) */
+  public applyRemote(key: string, value: unknown): void {
+    if (key === 'settings' && value && typeof value === 'object') {
+      const v = value as Record<string, any>;
+      value = { ...v, loginBackgroundUrl: v.loginBackgroundUrl || DEFAULT_LOGIN_BACKGROUND_DATA_URL };
+    }
+    if (key !== 'deletedParentAccounts' && key !== 'deletedTeacherAccounts') (this as any)[key] = value;
+    saveToStorage(key, value);
+    this.emitChange();
+  }
+
+  public cloudBridge(): LocalBridge {
+    return {
+      getAll: () => {
+        const out: Record<string, unknown> = {};
+        SYNC_COLLECTIONS.forEach(k => { out[k] = (this as any)[k]; });
+        SYNC_DOCS.forEach(k => {
+          out[k] = (k === 'settings') ? this.settings : loadFromStorage<string[]>(k, []);
+        });
+        return out;
+      },
+      apply: (k, v) => this.applyRemote(k, v),
+    };
   }
 
   public logAudit(action: string, details: string): void {
@@ -717,6 +762,7 @@ export class NurseryStorageService {
       const user = { ...ADMIN_USER };
       this.currentUser = user;
       this.save('auth_session', user);
+      void seedCloudIfNeeded();
       this.logAudit('تسجيل دخول الإدارة', `تم تسجيل الدخول بنجاح لحساب الإدارة: Nihel`);
       return { success: true, message: 'أهلاً بك Nihel! تم تسجيل الدخول بنجاح', user };
     }

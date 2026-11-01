@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // مرحلة الاختبار فقط: مفتوحة لأي شخص يملك إعدادات المشروع.
+    // لا تضع بيانات أطفال حقيقية قبل المرحلة التالية (تسجيل دخول حقيقي + قواعد حماية لكل دور).
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

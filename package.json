@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@capacitor/android": "^8.6.0",
     "@capacitor/core": "^8.6.0",
     "@capacitor/filesystem": "^8.1.5",
     "@capacitor/share": "^8.0.3",
@@ -10,6 +11,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "canvas-confetti": "^1.9.4",
     "exceljs": "^4.4.0",
+    "firebase": "^13.1.0",
     "jsqr": "^1.4.0",
     "lucide-react": "^1.66.0",
     "qrcode": "^1.5.4",
@@ -25,6 +27,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "android:sync": "vite build && cap sync android",
+    "android:open": "cap open android"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0"
   }
 }

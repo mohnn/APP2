@@ -50,6 +50,8 @@ import { User, Child, PaymentReceipt } from './types/nursery';
 
 export default function App() {
   const storage = NurseryStorageService.getInstance();
+  const [, setRemoteTick] = useState(0);
+  useEffect(() => storage.subscribe(() => setRemoteTick(t => t + 1)), [storage]);
 
   // Persistent Auth State (النقطة 1: حفظ جلسة تسجيل الدخول وتذكرها تلقائياً)
   // نوع الجهاز (إدارة / ولي أمر): يتحدد مرة واحدة من شاشة الاسم ويُحفظ على الجهاز
