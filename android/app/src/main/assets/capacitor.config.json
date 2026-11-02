@@ -1,0 +1,8 @@
+{
+	"appId": "com.modernbritishkids.app",
+	"appName": "Modern British Kids",
+	"webDir": "dist",
+	"android": {
+		"allowMixedContent": false
+	}
+}
